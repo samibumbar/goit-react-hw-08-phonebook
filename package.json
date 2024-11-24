@@ -1,0 +1,30 @@
+{
+  "name": "react-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build --base=/goit-react-hw-07-phonebook",
+    "preview": "vite preview",
+    "lint:prettier": "prettier . --check",
+    "fix:prettier": "prettier . --write"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "prettier": "3.3.3",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.8"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.3.0",
+    "axios": "^1.7.7",
+    "classnames": "^2.5.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.2",
+    "redux-persist": "^6.0.0",
+    "yup": "^1.4.0"
+  }
+}
