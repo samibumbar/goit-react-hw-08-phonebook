@@ -9,6 +9,7 @@ import {
   IconButton,
   InputAdornment,
   Alert,
+  FormHelperText,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -19,17 +20,53 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
+
   const navigate = useNavigate();
+
+  const evaluatePasswordStrength = (password: string) => {
+    let strength = 0;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z\d]/.test(password)) strength++;
+    if (strength < 2) return "Weak";
+    if (strength === 2) return "Moderate";
+    return "Strong";
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (!isPasswordTouched) {
+      setIsPasswordTouched(true);
+    }
+    if (value.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+      setPasswordStrength("");
+    } else if (!/[^a-zA-Z\d]/.test(value)) {
+      setPasswordError(
+        "Password must contain at least one special character (e.g., @, #, !, etc.)."
+      );
+      setPasswordStrength("");
+    } else {
+      setPasswordError(null);
+      setPasswordStrength(evaluatePasswordStrength(value));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
     if (!name || !email || !password) {
       setError("All fields are required.");
       return;
     }
-
+    if (password.length < 8 || !/[^a-zA-Z\d]/.test(password)) {
+      setError("Password must meet all requirements.");
+      return;
+    }
     try {
       await api.post("/users/signup", { name, email, password });
       alert("Registration successful! You can now log in.");
@@ -72,7 +109,6 @@ const Register: React.FC = () => {
         label="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        required
         autoComplete="name"
       />
       <TextField
@@ -81,7 +117,6 @@ const Register: React.FC = () => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        required
         autoComplete="email"
       />
       <TextField
@@ -89,8 +124,10 @@ const Register: React.FC = () => {
         label="Password"
         type={showPassword ? "text" : "password"}
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(e) => handlePasswordChange(e.target.value)}
+        onFocus={() => setIsPasswordTouched(true)}
         required
+        error={!!passwordError}
         autoComplete="new-password"
         InputProps={{
           endAdornment: (
@@ -106,6 +143,27 @@ const Register: React.FC = () => {
           ),
         }}
       />
+      {isPasswordTouched && passwordError && (
+        <FormHelperText error>{passwordError}</FormHelperText>
+      )}
+      {isPasswordTouched &&
+        password.length >= 8 &&
+        !passwordError &&
+        passwordStrength && (
+          <FormHelperText>
+            <Typography
+              color={
+                passwordStrength === "Strong"
+                  ? "green"
+                  : passwordStrength === "Moderate"
+                    ? "orange"
+                    : "red"
+              }
+            >
+              Password strength: {passwordStrength}
+            </Typography>
+          </FormHelperText>
+        )}
       <Button type="submit" variant="contained" fullWidth>
         Register
       </Button>
