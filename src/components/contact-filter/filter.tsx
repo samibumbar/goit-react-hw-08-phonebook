@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../contact-form/form.module.css";
+import { TextField, Box } from "@mui/material";
 
 interface FilterProps {
   filter: string;
@@ -8,15 +8,14 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = ({ filter, onChange }) => {
   return (
-    <div className={styles["input-search"]}>
-      <input
-        className={styles.input}
-        type="text"
+    <Box sx={{ mb: 2 }}>
+      <TextField
+        label="Search Contacts"
         value={filter}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search contacts..."
+        fullWidth
       />
-    </div>
+    </Box>
   );
 };
 

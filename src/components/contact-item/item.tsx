@@ -1,5 +1,6 @@
 import React from "react";
-import styles from "./item.module.css";
+import { ListItem, ListItemText, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface ContactItemProps {
   contact: { id: string; name: string; number: string };
@@ -8,15 +9,15 @@ interface ContactItemProps {
 
 const ContactItem: React.FC<ContactItemProps> = ({ contact, onDelete }) => {
   return (
-    <li>
-      {contact.name}: {contact.number}
-      <button
-        onClick={() => onDelete(contact.id)}
-        className={styles["delete-button"]}
-      >
-        Delete
-      </button>
-    </li>
+    <ListItem
+      secondaryAction={
+        <IconButton edge="end" onClick={() => onDelete(contact.id)}>
+          <DeleteIcon />
+        </IconButton>
+      }
+    >
+      <ListItemText primary={contact.name} secondary={contact.number} />
+    </ListItem>
   );
 };
 

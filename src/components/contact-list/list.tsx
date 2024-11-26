@@ -1,6 +1,7 @@
 import React from "react";
+import { List } from "@mui/material";
 import ContactItem from "../contact-item/item";
-import styles from "./list.module.css";
+
 interface ContactListProps {
   contacts: { id: string; name: string; number: string }[];
   onDelete: (id: string) => void;
@@ -8,11 +9,11 @@ interface ContactListProps {
 
 const ContactList: React.FC<ContactListProps> = ({ contacts, onDelete }) => {
   return (
-    <ul className={styles["lists-container"]}>
+    <List>
       {contacts.map((contact) => (
         <ContactItem key={contact.id} contact={contact} onDelete={onDelete} />
       ))}
-    </ul>
+    </List>
   );
 };
 

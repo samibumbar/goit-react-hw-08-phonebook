@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { contactFormSchema } from "./validation";
 import { ValidationError } from "yup";
-import styles from "./form.module.css";
+import { Box, TextField, Button, Typography } from "@mui/material";
 
 interface ContactFormProps {
   onSubmit: (name: string, number: string) => void;
@@ -42,39 +42,34 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.wrapper}>
-      <div className={styles["inputs-container"]}>
-        <div>
-          <input
-            className={styles.input}
-            type="text"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter contact name"
-            required
-          />
-          {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
-        </div>
-
-        <div>
-          <input
-            className={styles.input}
-            type="tel"
-            name="number"
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            placeholder="Enter phone number"
-            required
-          />
-          {errors.number && <p style={{ color: "red" }}>{errors.number}</p>}
-        </div>
-      </div>
-
-      <button className={styles.button} type="submit">
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+    >
+      <Typography variant="h5" textAlign="center">
         Add Contact
-      </button>
-    </form>
+      </Typography>
+      <TextField
+        label="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        error={!!errors.name}
+        helperText={errors.name}
+        fullWidth
+      />
+      <TextField
+        label="Phone Number"
+        value={number}
+        onChange={(e) => setNumber(e.target.value)}
+        error={!!errors.number}
+        helperText={errors.number}
+        fullWidth
+      />
+      <Button type="submit" variant="contained" fullWidth>
+        Add Contact
+      </Button>
+    </Box>
   );
 };
 

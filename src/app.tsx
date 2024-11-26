@@ -1,66 +1,59 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "./store";
+import { useEffect } from "react";
 import {
-  fetchContacts,
-  addContact,
-  deleteContact,
-  setFilter,
-} from "./contactsSlice";
-import { ContactForm, Filter, ContactList } from "./components";
-import styles from "./app.module.css";
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./redux/store";
+import { fetchCurrentUser } from "./redux/authSlice";
+import Navigation from "./components/navigation/navigation";
+import Login from "./pages/login/login";
+import Register from "./pages/register/register";
+import Contacts from "./pages/contacts/contacts";
+import Profile from "./pages/profile/profile";
 
-const App: React.FC = () => {
-  const {
-    items: contacts,
-    isLoading,
-    error,
-    filter,
-  } = useSelector((state: RootState) => state.contacts);
+const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+  const token = useSelector((state: RootState) => state.auth.token);
+  return token ? children : <Navigate to="/login" />;
+};
 
+const App = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
-  const handleAddContact = (name: string, number: string) => {
-    if (contacts.some((contact) => contact.name === name)) {
-      alert(`${name} is already in contacts.`);
-      return;
+    if (token) {
+      dispatch(fetchCurrentUser());
     }
-    dispatch(addContact({ name, number }));
-  };
-
-  const handleDeleteContact = (id: string) => {
-    dispatch(deleteContact(id));
-  };
-
-  const handleFilterChange = (filter: string) => {
-    dispatch(setFilter(filter));
-  };
-
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  }, [dispatch, token]);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.h1}>Phonebook</h1>
-      <ContactForm onSubmit={handleAddContact} />
-      <h2 className={styles.h2}>Contacts</h2>
-      <Filter filter={filter} onChange={handleFilterChange} />
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
-        <ContactList
-          contacts={filteredContacts}
-          onDelete={handleDeleteContact}
+    <Router>
+      <Navigation />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
         />
-      )}
-    </div>
+        <Route
+          path="/contacts"
+          element={
+            <PrivateRoute>
+              <Contacts />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
 };
 

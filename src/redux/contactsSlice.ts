@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const BASE_URL = "https://6739e4ffa3a36b5a62efeb72.mockapi.io/contacts";
+import api from "../api/api";
 
 interface Contact {
   id: string;
@@ -13,33 +11,31 @@ interface ContactsState {
   items: Contact[];
   isLoading: boolean;
   error: string | null;
-  filter: string;
 }
 
 const initialState: ContactsState = {
   items: [],
   isLoading: false,
   error: null,
-  filter: "",
 };
 
 export const fetchContacts = createAsyncThunk("contacts/fetchAll", async () => {
-  const response = await axios.get(BASE_URL);
+  const response = await api.get("/contacts");
   return response.data;
 });
 
 export const addContact = createAsyncThunk(
-  "contacts/addContact",
-  async (newContact: Omit<Contact, "id">) => {
-    const response = await axios.post(BASE_URL, newContact);
+  "contacts/add",
+  async (contact: Omit<Contact, "id">) => {
+    const response = await api.post("/contacts", contact);
     return response.data;
   }
 );
 
 export const deleteContact = createAsyncThunk(
-  "contacts/deleteContact",
+  "contacts/delete",
   async (id: string) => {
-    await axios.delete(`${BASE_URL}/${id}`);
+    await api.delete(`/contacts/${id}`);
     return id;
   }
 );
@@ -47,11 +43,7 @@ export const deleteContact = createAsyncThunk(
 const contactsSlice = createSlice({
   name: "contacts",
   initialState,
-  reducers: {
-    setFilter: (state, action: PayloadAction<string>) => {
-      state.filter = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchContacts.pending, (state) => {
@@ -85,5 +77,4 @@ const contactsSlice = createSlice({
   },
 });
 
-export const { setFilter } = contactsSlice.actions;
 export default contactsSlice.reducer;
