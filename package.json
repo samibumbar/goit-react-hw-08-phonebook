@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base=/goit-react-hw-08-phonebook",
+    "build": "tsc && vite build --base=/goit-react-hw-08-phonebook/",
     "preview": "vite preview",
     "lint:prettier": "prettier . --check",
     "fix:prettier": "prettier . --write"
