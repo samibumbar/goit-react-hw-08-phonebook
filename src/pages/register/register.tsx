@@ -8,30 +8,45 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+const Register: React.FC = () => {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (!name || !email || !password) {
+      setError("All fields are required.");
+      return;
+    }
+
     try {
-      // API call pentru înregistrare
       await api.post("/users/signup", { name, email, password });
       alert("Registration successful! You can now log in.");
       navigate("/login");
-    } catch (error) {
-      alert("Registration failed! Please try again.");
+    } catch (error: any) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.code === 11000
+      ) {
+        setError("This email is already registered. Please use another email.");
+      } else {
+        setError("Registration failed! Please try again.");
+      }
     }
   };
 
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = (): void => {
     setShowPassword((prev) => !prev);
   };
 
@@ -51,11 +66,14 @@ const Register = () => {
       <Typography variant="h4" textAlign="center">
         Register
       </Typography>
+      {error && <Alert severity="error">{error}</Alert>}
       <TextField
         fullWidth
         label="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        required
+        autoComplete="name"
       />
       <TextField
         fullWidth
@@ -63,6 +81,8 @@ const Register = () => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
+        autoComplete="email"
       />
       <TextField
         fullWidth
@@ -70,6 +90,8 @@ const Register = () => {
         type={showPassword ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
+        autoComplete="new-password"
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
